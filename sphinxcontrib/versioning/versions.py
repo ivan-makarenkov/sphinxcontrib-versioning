@@ -106,6 +106,11 @@ class Versions(object):
         :param str priority: May be "branches" or "tags". Groups either before the other. Maintains order otherwise.
         :param bool invert: Invert sorted/grouped remotes at the end of processing.
         """
+
+        version_dirs = {
+            'ticket/DOC-1263_test': 'latest'
+        }
+
         self.remotes = [dict(
             id='/'.join(r[2:0:-1]),  # str; kind/name
             sha=r[0],  # str
@@ -115,7 +120,7 @@ class Versions(object):
             conf_rel_path=r[4],  # str
             found_docs=tuple(),  # tuple of str
             master_doc='contents',  # str
-            root_dir=r[1],  # str
+            root_dir=version_dirs.get(r[1], r[1]),  # str
         ) for r in remotes]
         self.context = dict()
         self.greatest_tag_remote = None

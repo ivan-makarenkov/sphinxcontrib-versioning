@@ -146,7 +146,7 @@ def run_command(local_root, command, env_var=True, pipeto=None, retry=0, environ
             main_output = main.communicate()[1].decode('utf-8')  # Might deadlock if stderr is written to a lot.
         else:
             main_output = main.communicate()[0].decode('utf-8')
-    log.debug(json.dumps(dict(cwd=local_root, command=command, code=main.poll(), output=main_output)))
+    # log.debug(json.dumps(dict(cwd=local_root, command=command, code=main.poll(), output=main_output)))
 
     # Verify success.
     if main.poll() != 0:
@@ -295,7 +295,7 @@ def export(local_root, commit, target):
         try:
             with tarfile.open(fileobj=stdout, mode='r|') as tar:
                 for info in tar:
-                    log.debug('name: %s; mode: %d; size: %s; type: %s', info.name, info.mode, info.size, info.type)
+                    # log.debug('name: %s; mode: %d; size: %s; type: %s', info.name, info.mode, info.size, info.type)
                     path = os.path.realpath(os.path.join(target, info.name))
                     if not path.startswith(target):  # Handle bad paths.
                         log.warning('Ignoring tar object path %s outside of target directory.', info.name)

@@ -131,7 +131,7 @@ def pre_build(local_root, versions):
 
     # Define root_dir for all versions to avoid file name collisions.
     for remote in versions.remotes:
-        root_dir = RE_INVALID_FILENAME.sub('_', remote['name'])
+        root_dir = RE_INVALID_FILENAME.sub('_', remote['root_dir'])
         while root_dir in existing:
             root_dir += '_'
         remote['root_dir'] = root_dir
