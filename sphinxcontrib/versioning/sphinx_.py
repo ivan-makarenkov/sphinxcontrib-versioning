@@ -112,6 +112,7 @@ class EventHandlers(object):
         context['versions'] = versions
         context['vhasdoc'] = versions.vhasdoc
         context['vpathto'] = versions.vpathto
+        context['vpathto_or_none'] = versions.vpathto_or_none
 
         # Insert banner into body.
         if cls.SHOW_BANNER and 'body' in context:

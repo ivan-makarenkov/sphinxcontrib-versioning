@@ -108,7 +108,8 @@ class Versions(object):
         """
 
         version_dirs = {
-            'ticket/DOC-1263_test': 'latest'
+            'epic/DOC-1216_doc_3.1': '3.1',
+            'epic/DOC-1216_doc_2.6': '2.6',
         }
 
         self.remotes = [dict(
@@ -200,12 +201,26 @@ class Versions(object):
     @property
     def branches(self):
         """Return list of (name and urls) only branches."""
-        return [(r['name'], self.vpathto(r['name'])) for r in self.remotes if r['kind'] == 'heads']
+        branches = []
+        for r in self.remotes:
+            if r['kind'] == 'heads':
+                path = self.vpathto_or_none(r['name'])
+                if path is not None:
+                    branches.append((r['name'], path))
+
+        return branches
 
     @property
     def tags(self):
         """Return list of (name and urls) only tags."""
-        return [(r['name'], self.vpathto(r['name'])) for r in self.remotes if r['kind'] == 'tags']
+        tags = []
+        for r in self.remotes:
+            if r['kind'] == 'tags':
+                path = self.vpathto_or_none(r['name'])
+                if path is not None:
+                    tags.append((r['name'], path))
+
+        return tags
 
     def vhasdoc(self, other_version):
         """Return True if the other version has the current document. Like Sphinx's hasdoc().
@@ -244,3 +259,20 @@ class Versions(object):
         components += [other_root_dir] if is_root else ['..', other_root_dir]
         components += [pagename if self.vhasdoc(other_version) else other_remote['master_doc']]
         return '{}.html'.format(__import__('posixpath').join(*components))
+
+    def vpathto_or_none(self, other_version):
+        """Return relative path to current document in another version. Like Sphinx's pathto().
+
+        If the current document doesn't exist in the other version None will be returned instead.
+
+        :raise KeyError: If other_version doesn't exist.
+
+        :param str other_version: Version to link to.
+
+        :return: Relative path or None
+        :rtype: str|None
+        """
+        if not self.vhasdoc(other_version):
+            return None
+
+        return self.vpathto(other_version)
