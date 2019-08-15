@@ -98,19 +98,15 @@ class Versions(object):
     :ivar dict recent_tag_remote: Most recently committed tag.
     """
 
-    def __init__(self, remotes, sort=None, priority=None, invert=False):
+    def __init__(self, remotes, sort=None, priority=None, invert=False, version_dirs=dict()):
         """Constructor.
 
         :param iter remotes: Output of routines.gather_git_info(). Converted to list of dicts as instance variable.
         :param iter sort: List of strings (order matters) to sort remotes by. Strings may be: alpha, time, semver
         :param str priority: May be "branches" or "tags". Groups either before the other. Maintains order otherwise.
         :param bool invert: Invert sorted/grouped remotes at the end of processing.
+        :param dict version_dirs: Dictionary of mappings between branch name and directory name
         """
-
-        version_dirs = {
-            'epic/DOC-1216_doc_3.1': '3.1',
-            'epic/DOC-1216_doc_2.6': '2.6',
-        }
 
         self.remotes = [dict(
             id='/'.join(r[2:0:-1]),  # str; kind/name

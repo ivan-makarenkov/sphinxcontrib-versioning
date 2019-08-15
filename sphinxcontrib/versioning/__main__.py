@@ -280,6 +280,7 @@ def build(config, rel_source, destination, **options):
         sort=config.sort,
         priority=config.priority,
         invert=config.invert,
+        version_dirs=config.version_dirs
     )
 
     # Get root ref.

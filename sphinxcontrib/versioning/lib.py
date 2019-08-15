@@ -45,6 +45,9 @@ class Config(object):
         self.whitelist_branches = tuple()
         self.whitelist_tags = tuple()
 
+        # Dicts
+        self.version_dirs = dict()
+
         # Integers.
         self.verbose = 0
 
