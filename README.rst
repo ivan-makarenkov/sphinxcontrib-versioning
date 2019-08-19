@@ -8,7 +8,8 @@ Oro Doc modifications
 This modification includes next changes:
 
 * Added "version_dirs" configuration option which allows to set name of destination directory for specific version (before branch name has been used)
-* Added "vpathto_or_none" function to context and use it when passing branch/tag versions to template. If document is not present in specific version then this version will not be added and displayed on UI for this document
+* Added "vpathto_or_none" function to Jinja2 context and use it when passing branch/tag versions to template. If document is not present in specific version then this version will not be added and displayed on UI for this document
+* Added "scv_root_ref" variable to Jinja2 context with ref name of the root
 
 General
 -------

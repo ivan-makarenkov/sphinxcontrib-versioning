@@ -91,6 +91,8 @@ class EventHandlers(object):
         this_remote = versions[cls.CURRENT_VERSION]
         banner_main_remote = versions[cls.BANNER_MAIN_VERSION] if cls.SHOW_BANNER else None
 
+        config = Config.from_context()
+
         # Update Jinja2 context.
         context['bitbucket_version'] = cls.CURRENT_VERSION
         context['current_version'] = cls.CURRENT_VERSION
@@ -106,6 +108,7 @@ class EventHandlers(object):
         context['scv_is_recent_branch'] = this_remote == versions.recent_branch_remote
         context['scv_is_recent_ref'] = this_remote == versions.recent_remote
         context['scv_is_recent_tag'] = this_remote == versions.recent_tag_remote
+        context['scv_root_ref'] = config.root_ref
         context['scv_is_root'] = cls.IS_ROOT
         context['scv_is_tag'] = this_remote['kind'] == 'tags'
         context['scv_show_banner'] = cls.SHOW_BANNER
