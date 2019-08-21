@@ -164,14 +164,21 @@ def build_all(exported_root, destination, versions):
     log = logging.getLogger(__name__)
 
     while True:
+        config = Config.from_context()
+
         # Build root.
-        remote = versions[Config.from_context().root_ref]
-        log.info('Building root: %s', remote['name'])
-        source = os.path.dirname(os.path.join(exported_root, remote['sha'], remote['conf_rel_path']))
-        build(source, destination, versions, remote['name'], True)
+        root_remote = versions[config.root_ref]
+
+        log.info('Building root: %s', root_remote['name'])
+        source = os.path.dirname(os.path.join(exported_root, root_remote['sha'], root_remote['conf_rel_path']))
+        build(source, destination, versions, root_remote['name'], True)
 
         # Build all refs.
         for remote in list(versions.remotes):
+            # Skip building root to separate directory
+            if config.reuse_root and remote['name'] == root_remote['name']:
+                continue
+
             log.info('Building ref: %s', remote['name'])
             source = os.path.dirname(os.path.join(exported_root, remote['sha'], remote['conf_rel_path']))
             target = os.path.join(destination, remote['root_dir'])

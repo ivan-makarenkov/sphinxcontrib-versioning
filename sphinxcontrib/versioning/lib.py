@@ -28,6 +28,7 @@ class Config(object):
         self.no_local_conf = False
         self.recent_tag = False
         self.show_banner = False
+        self.reuse_root = False
 
         # Strings.
         self.banner_main_ref = 'master'

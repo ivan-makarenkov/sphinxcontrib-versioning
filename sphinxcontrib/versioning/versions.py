@@ -98,7 +98,7 @@ class Versions(object):
     :ivar dict recent_tag_remote: Most recently committed tag.
     """
 
-    def __init__(self, remotes, sort=None, priority=None, invert=False, version_dirs=dict()):
+    def __init__(self, remotes, sort=None, priority=None, invert=False, version_dirs=dict(), reuse_root=False):
         """Constructor.
 
         :param iter remotes: Output of routines.gather_git_info(). Converted to list of dicts as instance variable.
@@ -124,6 +124,7 @@ class Versions(object):
         self.recent_branch_remote = None
         self.recent_remote = None
         self.recent_tag_remote = None
+        self.reuse_root = reuse_root
 
         # Sort one or more times.
         if sort:
@@ -188,6 +189,9 @@ class Versions(object):
         # Nothing found, IndexError not raised. item was probably a string, raising KeyError.
         raise KeyError(item)
 
+    def __delitem__(self, item):
+        self.remotes.remove(self[item])
+
     def __iter__(self):
         """Yield name and urls of branches and tags."""
         for remote in self.remotes:
@@ -202,7 +206,7 @@ class Versions(object):
             if r['kind'] == 'heads':
                 path = self.vpathto_or_none(r['name'])
                 if path is not None:
-                    branches.append((r['name'], path))
+                    branches.append((r['name'], r['root_dir'], path))
 
         return branches
 
@@ -214,7 +218,7 @@ class Versions(object):
             if r['kind'] == 'tags':
                 path = self.vpathto_or_none(r['name'])
                 if path is not None:
-                    tags.append((r['name'], path))
+                    tags.append((r['name'], r['root_dir'], path))
 
         return tags
 
@@ -250,7 +254,9 @@ class Versions(object):
             return '{}.html'.format(pagename.split('/')[-1])
 
         other_remote = self[other_version]
-        other_root_dir = other_remote['root_dir']
+        other_root_dir = ''
+        if not self.reuse_root or self.context['scv_root_ref'] != other_version:
+            other_root_dir = other_remote['root_dir']
         components = ['..'] * pagename.count('/')
         components += [other_root_dir] if is_root else ['..', other_root_dir]
         components += [pagename if self.vhasdoc(other_version) else other_remote['master_doc']]
@@ -268,6 +274,11 @@ class Versions(object):
         :return: Relative path or None
         :rtype: str|None
         """
+
+        # Don't return path for current version
+        if self.reuse_root and self.context['current_version'] == other_version:
+            return None
+
         if not self.vhasdoc(other_version):
             return None
 

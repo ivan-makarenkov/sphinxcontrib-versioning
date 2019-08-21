@@ -193,6 +193,8 @@ def build_options(func):
                         help="Group these kinds of versions at the top (for themes that don't separate them).")(func)
     func = click.option('-r', '--root-ref',
                         help='The branch/tag at the root of DESTINATION. Will also be in subdir. Default master.')(func)
+    func = click.option('-R', '--reuse-root',
+                        help='Don\'t build root version to separate directory but reuse it')(func)
     func = click.option('-s', '--sort', multiple=True, type=click.Choice(('semver', 'alpha', 'time')),
                         help='Sort versions. Specify multiple times to sort equal values of one kind.')(func)
     func = click.option('-t', '--greatest-tag', is_flag=True,
@@ -280,7 +282,8 @@ def build(config, rel_source, destination, **options):
         sort=config.sort,
         priority=config.priority,
         invert=config.invert,
-        version_dirs=config.version_dirs
+        version_dirs=config.version_dirs,
+        reuse_root=config.reuse_root
     )
 
     # Get root ref.
