@@ -96,6 +96,7 @@ class EventHandlers(object):
         # Update Jinja2 context.
         context['bitbucket_version'] = cls.CURRENT_VERSION
         context['current_version'] = cls.CURRENT_VERSION
+        context['oro_current_version'] = config.version_dirs.get(cls.CURRENT_VERSION, cls.CURRENT_VERSION)
         context['github_version'] = cls.CURRENT_VERSION
         context['html_theme'] = app.config.html_theme
         context['scv_banner_greatest_tag'] = cls.BANNER_GREATEST_TAG
