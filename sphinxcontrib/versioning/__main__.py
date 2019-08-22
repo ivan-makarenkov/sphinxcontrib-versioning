@@ -194,7 +194,7 @@ def build_options(func):
     func = click.option('-r', '--root-ref',
                         help='The branch/tag at the root of DESTINATION. Will also be in subdir. Default master.')(func)
     func = click.option('-R', '--reuse-root',
-                        help='Don\'t build root version to separate directory but reuse it')(func)
+                        help='Don\'t build root version to separate directory but reuse it', is_flag=True)(func)
     func = click.option('-s', '--sort', multiple=True, type=click.Choice(('semver', 'alpha', 'time')),
                         help='Sort versions. Specify multiple times to sort equal values of one kind.')(func)
     func = click.option('-t', '--greatest-tag', is_flag=True,
