@@ -98,7 +98,7 @@ class Versions(object):
     :ivar dict recent_tag_remote: Most recently committed tag.
     """
 
-    def __init__(self, remotes, sort=None, priority=None, invert=False, version_dirs=dict(), reuse_root=False):
+    def __init__(self, remotes, sort=None, priority=None, invert=False, version_dirs=None, reuse_root=False):
         """Constructor.
 
         :param iter remotes: Output of routines.gather_git_info(). Converted to list of dicts as instance variable.
@@ -107,6 +107,9 @@ class Versions(object):
         :param bool invert: Invert sorted/grouped remotes at the end of processing.
         :param dict version_dirs: Dictionary of mappings between branch name and directory name
         """
+
+        if version_dirs is None:
+            version_dirs = dict()
 
         self.remotes = [dict(
             id='/'.join(r[2:0:-1]),  # str; kind/name
