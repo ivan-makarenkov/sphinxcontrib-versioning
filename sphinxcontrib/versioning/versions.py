@@ -253,8 +253,9 @@ class Versions(object):
         """
         is_root = self.context['scv_is_root']
         pagename = self.context['pagename']
+        fileSuffix = self.context['file_suffix']
         if self.context['current_version'] == other_version and not is_root:
-            return '{}.html'.format(pagename.split('/')[-1])
+            return '{}'.format(pagename.split('/')[-1]) + fileSuffix
 
         other_remote = self[other_version]
         other_root_dir = ''
@@ -263,7 +264,7 @@ class Versions(object):
         components = ['..'] * pagename.count('/')
         components += [other_root_dir] if is_root else ['..', other_root_dir]
         components += [pagename if self.vhasdoc(other_version) else other_remote['master_doc']]
-        return '{}.html'.format(__import__('posixpath').join(*components))
+        return '{}'.format(__import__('posixpath').join(*components)) + fileSuffix
 
     def vpathto_or_none(self, other_version):
         """Return relative path to current document in another version. Like Sphinx's pathto().
