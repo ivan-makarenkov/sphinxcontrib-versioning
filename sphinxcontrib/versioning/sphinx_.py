@@ -171,7 +171,7 @@ class ConfigInject(SphinxConfig):
     def __init__(self, dirname, filename, overrides, tags):
         """Constructor."""
         super(ConfigInject, self).__init__(dirname, filename, overrides, tags)
-        self.extensions.append('sphinxcontrib.versioning.sphinx_')
+        self.extensions.insert(0, 'sphinxcontrib.versioning.sphinx_')
 
 
 def _build(argv, config, versions, current_name, is_root):
