@@ -15,7 +15,7 @@ IS_WINDOWS = sys.platform == 'win32'
 RE_ALL_REMOTES = re.compile(r'([\w./-]+)\t([A-Za-z0-9@:/\\._-]+) \((fetch|push)\)\n')
 RE_REMOTE = re.compile(r'^(?P<sha>[0-9a-f]{5,40})\trefs/(?P<kind>heads|tags)/(?P<name>[\w./-]+(?:\^\{})?)$',
                        re.MULTILINE)
-RE_UNIX_TIME = re.compile(r'^\d{10}$', re.MULTILINE)
+RE_UNIX_TIME = re.compile(r'^\d{10}', re.MULTILINE)
 WHITELIST_ENV_VARS = (
     'APPVEYOR',
     'APPVEYOR_ACCOUNT_NAME',
