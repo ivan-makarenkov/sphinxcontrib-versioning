@@ -121,8 +121,9 @@ def pre_build(local_root, versions):
         log.debug('Exporting %s to temporary directory.', sha)
         export(local_root, sha, target)
 
+    current_config = Config.from_context()
     # Build root.
-    remote = versions[Config.from_context().root_ref]
+    remote = versions[current_config.root_ref]
     with TempDir() as temp_dir:
         log.debug('Building root (before setting root_dirs) in temporary directory: %s', temp_dir)
         source = os.path.dirname(os.path.join(exported_root, remote['sha'], remote['conf_rel_path']))
@@ -144,9 +145,11 @@ def pre_build(local_root, versions):
         source = os.path.dirname(os.path.join(exported_root, remote['sha'], remote['conf_rel_path']))
         try:
             config = read_config(source, remote['name'])
-        except HandledError:
+        except HandledError, e:
             log.warning('Skipping. Will not be building: %s', remote['name'])
             versions.remotes.pop(versions.remotes.index(remote))
+            if current_config.stop_on_fail:
+                raise e
             continue
         remote['found_docs'] = config['found_docs']
         remote['master_doc'] = config['master_doc']
@@ -184,9 +187,11 @@ def build_all(exported_root, destination, versions):
             target = os.path.join(destination, remote['root_dir'])
             try:
                 build(source, target, versions, remote['name'], False)
-            except HandledError:
+            except HandledError, e:
                 log.warning('Skipping. Will not be building %s. Rebuilding everything.', remote['name'])
                 versions.remotes.pop(versions.remotes.index(remote))
+                if config.stop_on_fail:
+                    raise e
                 break  # Break out of for loop.
         else:
             break  # Break out of while loop if for loop didn't execute break statement above.

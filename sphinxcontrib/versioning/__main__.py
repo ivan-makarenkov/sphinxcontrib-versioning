@@ -188,6 +188,8 @@ def build_options(func):
     func = click.option('-b', '--show-banner', help='Show a warning banner.', is_flag=True)(func)
     func = click.option('-B', '--banner-main-ref',
                         help="Don't show banner on this ref and point banner URLs to this ref. Default master.")(func)
+    func = click.option('-F', '--stop-on-fail', is_flag=True,
+                        help='Stop execution in case of error during versions building')(func)
     func = click.option('-i', '--invert', help='Invert/reverse order of versions.', is_flag=True)(func)
     func = click.option('-p', '--priority', type=click.Choice(('branches', 'tags')),
                         help="Group these kinds of versions at the top (for themes that don't separate them).")(func)

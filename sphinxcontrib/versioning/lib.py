@@ -29,6 +29,7 @@ class Config(object):
         self.recent_tag = False
         self.show_banner = False
         self.reuse_root = False
+        self.stop_on_fail = False
 
         # Strings.
         self.banner_main_ref = 'master'

@@ -13,6 +13,7 @@ This modification includes next changes:
 * Added `oro_current_version` variable to Jinja2 context with version name processed by "version_dirs" configuration
 * Added `-R/--reuse-root` option to `build` command which allows to reuse existing root instead of additional building separate directory for root version.
 * Fixed bug related to warnings during executing git commands (see https://github.com/sphinx-contrib/sphinxcontrib-versioning/pull/71)
+* Added `-F/--stop-on-fail` option to stop execution in case of error during versions building
 
 General
 -------
