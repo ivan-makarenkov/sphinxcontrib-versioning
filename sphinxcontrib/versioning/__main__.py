@@ -130,6 +130,7 @@ def cli(config, **options):
     :param sphinxcontrib.versioning.lib.Config config: Runtime configuration.
     :param dict options: Additional Click options.
     """
+
     def pre(rel_source):
         """To be executed in a Click sub command.
 
@@ -169,6 +170,7 @@ def cli(config, **options):
         elif os.path.basename(config.local_conf) != 'conf.py':
             log.error('Path "%s" must end with conf.py.', config.local_conf)
             raise HandledError
+
     config['pre'] = pre  # To be called by Click sub commands.
     config.update(options)
 
@@ -285,7 +287,8 @@ def build(config, rel_source, destination, **options):
         priority=config.priority,
         invert=config.invert,
         version_dirs=config.version_dirs,
-        reuse_root=config.reuse_root
+        version_human_readable_names=config.version_human_readable_names,
+        reuse_root=config.reuse_root,
     )
 
     # Get root ref.

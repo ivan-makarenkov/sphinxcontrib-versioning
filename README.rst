@@ -11,9 +11,12 @@ This modification includes next changes:
 * Added `vpathto_or_none` function to Jinja2 context and use it when passing branch/tag versions to template. If document is not present in specific version then this version will not be added and displayed on UI for this document
 * Added `scv_root_ref` variable to Jinja2 context with ref name of the root
 * Added `oro_current_version` variable to Jinja2 context with version name processed by "version_dirs" configuration
+* Added `oro_version_dirs` variable to Jinja2 context with an array of `version_dirs` config option
 * Added `-R/--reuse-root` option to `build` command which allows to reuse existing root instead of additional building separate directory for root version.
 * Fixed bug related to warnings during executing git commands (see https://github.com/sphinx-contrib/sphinxcontrib-versioning/pull/71)
 * Added `-F/--stop-on-fail` option to stop execution in case of error during versions building
+* Added `version_human_readable_names` configuration option which allows to set human readable version name for specific version based on branch name
+* Added `oro_version_human_readable_names` variable to Jinja2 context with an array of `version_human_readable_names` config option
 
 General
 -------

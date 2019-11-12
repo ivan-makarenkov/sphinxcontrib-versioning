@@ -49,6 +49,7 @@ class Config(object):
 
         # Dicts
         self.version_dirs = dict()
+        self.version_human_readable_names = dict()
 
         # Integers.
         self.verbose = 0

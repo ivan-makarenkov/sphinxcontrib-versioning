@@ -98,7 +98,8 @@ class Versions(object):
     :ivar dict recent_tag_remote: Most recently committed tag.
     """
 
-    def __init__(self, remotes, sort=None, priority=None, invert=False, version_dirs=None, reuse_root=False):
+    def __init__(self, remotes, sort=None, priority=None, invert=False, version_dirs=None,
+                 version_human_readable_names=None, reuse_root=False):
         """Constructor.
 
         :param iter remotes: Output of routines.gather_git_info(). Converted to list of dicts as instance variable.
@@ -106,10 +107,16 @@ class Versions(object):
         :param str priority: May be "branches" or "tags". Groups either before the other. Maintains order otherwise.
         :param bool invert: Invert sorted/grouped remotes at the end of processing.
         :param dict version_dirs: Dictionary of mappings between branch name and directory name
+        :param dict version_human_readable_names: Dictionary of mappings between branch name and human readable names
+         which are used on UI
+        :param dict reuse_root: Reuse existing root instead of additional building separate directory for root version.
         """
 
         if version_dirs is None:
             version_dirs = dict()
+
+        if version_human_readable_names is None:
+            version_human_readable_names = dict()
 
         self.remotes = [dict(
             id='/'.join(r[2:0:-1]),  # str; kind/name
@@ -121,6 +128,7 @@ class Versions(object):
             found_docs=tuple(),  # tuple of str
             master_doc='contents',  # str
             root_dir=version_dirs.get(r[1], r[1]),  # str
+            human_readable_name=version_human_readable_names.get(r[1], r[1]),  # str
         ) for r in remotes]
         self.context = dict()
         self.greatest_tag_remote = None
@@ -209,7 +217,7 @@ class Versions(object):
             if r['kind'] == 'heads':
                 path = self.vpathto_or_none(r['name'])
                 if path is not None:
-                    branches.append((r['name'], r['root_dir'], path))
+                    branches.append((r['name'], r['human_readable_name'], path))
 
         return branches
 
@@ -221,7 +229,7 @@ class Versions(object):
             if r['kind'] == 'tags':
                 path = self.vpathto_or_none(r['name'])
                 if path is not None:
-                    tags.append((r['name'], r['root_dir'], path))
+                    tags.append((r['name'], r['human_readable_name'], path))
 
         return tags
 
