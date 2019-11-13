@@ -217,7 +217,7 @@ class Versions(object):
             if r['kind'] == 'heads':
                 path = self.vpathto_or_none(r['name'])
                 if path is not None:
-                    branches.append((r['name'], r['human_readable_name'], path))
+                    branches.append((r['name'], r['human_readable_name'], path, r['root_dir']))
 
         return branches
 
@@ -229,7 +229,7 @@ class Versions(object):
             if r['kind'] == 'tags':
                 path = self.vpathto_or_none(r['name'])
                 if path is not None:
-                    tags.append((r['name'], r['human_readable_name'], path))
+                    tags.append((r['name'], r['human_readable_name'], path, r['root_dir']))
 
         return tags
 
