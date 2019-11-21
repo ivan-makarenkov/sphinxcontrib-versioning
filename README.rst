@@ -17,6 +17,7 @@ This modification includes next changes:
 * Added `-F/--stop-on-fail` option to stop execution in case of error during versions building
 * Added `version_human_readable_names` configuration option which allows to set human readable version name for specific version based on branch name
 * Added `oro_version_human_readable_names` variable to Jinja2 context with an array of `version_human_readable_names` config option
+* Added `build_args_per_version` configuration option which allows to set custom sphinx-build arguments per versions
 
 General
 -------

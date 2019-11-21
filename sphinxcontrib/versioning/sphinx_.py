@@ -202,6 +202,8 @@ def _build(argv, config, versions, current_name, is_root):
         argv += ('-v',) * (config.verbose - 1)
     if config.no_colors:
         argv += ('-N',)
+    if current_name in config.build_args_per_version:
+        argv += config.build_args_per_version[current_name]
     if config.overflow:
         argv += config.overflow
 
