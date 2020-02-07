@@ -43,8 +43,8 @@ class EventHandlers(object):
     SHOW_BANNER = False
     VERSIONS = None
 
-    @staticmethod
-    def builder_inited(app):
+    @classmethod
+    def builder_inited(cls, app):
         """Update the Sphinx builder.
 
         :param sphinx.application.Sphinx app: Sphinx application object.
@@ -54,6 +54,10 @@ class EventHandlers(object):
         app.builder.templates.pathchain.insert(0, templates_dir)
         app.builder.templates.loaders.insert(0, SphinxFileSystemLoader(templates_dir))
         app.builder.templates.templatepathlen += 1
+
+        config = Config.from_context()
+        app.scv_is_root = cls.IS_ROOT
+        app.scv_oro_current_version = config.version_dirs.get(cls.CURRENT_VERSION, cls.CURRENT_VERSION)
 
         # Add versions.html to sidebar.
         if '**' not in app.config.html_sidebars:
