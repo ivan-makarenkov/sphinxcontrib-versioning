@@ -29,6 +29,26 @@ Sphinx extension that allows building versioned docs for self-hosting.
 
 📖 Full documentation: https://sphinxcontrib-versioning.readthedocs.io
 
+.. image:: https://readthedocs.org/projects/sphinxcontrib-versioning/badge/?version=latest
+    :target: https://sphinxcontrib-versioning.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
+
+.. image:: https://img.shields.io/appveyor/ci/Robpol86/sphinxcontrib-versioning/master.svg?style=flat-square&label=AppVeyor%20CI
+    :target: https://ci.appveyor.com/project/Robpol86/sphinxcontrib-versioning
+    :alt: Build Status Windows
+
+.. image:: https://img.shields.io/travis/sphinx-contrib/sphinxcontrib-versioning/master.svg?style=flat-square&label=Travis%20CI
+    :target: https://travis-ci.org/sphinx-contrib/sphinxcontrib-versioning
+    :alt: Build Status
+
+.. image:: https://img.shields.io/codecov/c/github/sphinx-contrib/sphinxcontrib-versioning/master.svg?style=flat-square&label=Codecov
+    :target: https://codecov.io/gh/sphinx-contrib/sphinxcontrib-versioning
+    :alt: Coverage Status
+
+.. image:: https://img.shields.io/pypi/v/sphinxcontrib-versioning.svg?style=flat-square&label=Latest
+    :target: https://pypi.python.org/pypi/sphinxcontrib-versioning
+    :alt: Latest Version
+
 Quickstart
 ==========
 
