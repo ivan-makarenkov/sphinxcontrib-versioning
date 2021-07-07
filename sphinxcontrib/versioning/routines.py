@@ -145,7 +145,7 @@ def pre_build(local_root, versions):
         source = os.path.dirname(os.path.join(exported_root, remote['sha'], remote['conf_rel_path']))
         try:
             config = read_config(source, remote['name'])
-        except HandledError, e:
+        except HandledError as e:
             log.warning('Skipping. Will not be building: %s', remote['name'])
             versions.remotes.pop(versions.remotes.index(remote))
             if current_config.stop_on_fail:
@@ -187,7 +187,7 @@ def build_all(exported_root, destination, versions):
             target = os.path.join(destination, remote['root_dir'])
             try:
                 build(source, target, versions, remote['name'], False)
-            except HandledError, e:
+            except HandledError as e:
                 log.warning('Skipping. Will not be building %s. Rebuilding everything.', remote['name'])
                 versions.remotes.pop(versions.remotes.index(remote))
                 if config.stop_on_fail:
