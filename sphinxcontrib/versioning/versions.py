@@ -247,7 +247,7 @@ class Versions(object):
         """
         if self.context['current_version'] == other_version:
             return True
-        return self.context['pagename'] in self[other_version]['found_docs']
+        return self.context['pagename'] in decompress(self[other_version]['found_docs'])
 
     def vpathto(self, other_version):
         """Return relative path to current document in another version. Like Sphinx's pathto().
@@ -309,3 +309,20 @@ class Versions(object):
         components += ["_static"]
         components += [os.path.splitext(self.pdf_file)[0]]
         return '{}.pdf'.format(__import__('posixpath').join(*components))
+
+def multiple_replace(items, replace_list):
+	result = []
+	string = ''
+	for item in items:
+		for replace in replace_list:
+			string = item.replace(*replace)
+		result.append(string)
+	return result
+
+def decompress(items):
+	replace_list = (("be/", "backend/"), ("u/", "user/"), ("bd/", "bundles/"), ("c/", "community/"), ("f/", "frontend/"))
+	return multiple_replace(items, replace_list)
+
+def compress(items):
+	replace_list = (("backend/", "be/"), ("user/", "u/"), ("bundles/", "bd/"), ("community/", "c/"), ("frontend/", "f/"))
+	return multiple_replace(items, replace_list)

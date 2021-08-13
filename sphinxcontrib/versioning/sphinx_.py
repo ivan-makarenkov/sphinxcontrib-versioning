@@ -17,7 +17,7 @@ from sphinx.util.i18n import format_date
 
 from sphinxcontrib.versioning import __version__
 from sphinxcontrib.versioning.lib import Config, HandledError, TempDir
-from sphinxcontrib.versioning.versions import Versions
+from sphinxcontrib.versioning.versions import Versions, compress
 
 SC_VERSIONING_VERSIONS = list()  # Updated after forking.
 STATIC_DIR = os.path.join(os.path.dirname(__file__), '_static')
@@ -82,7 +82,7 @@ class EventHandlers(object):
         """
         if cls.ABORT_AFTER_READ:
             config = {n: getattr(app.config, n) for n in (a for a in dir(app.config) if a.startswith('scv_'))}
-            config['found_docs'] = tuple(str(d) for d in env.found_docs)
+            config['found_docs'] = compress(tuple(str(d) for d in env.found_docs))
             config['master_doc'] = str(app.config.master_doc)
             cls.ABORT_AFTER_READ.put(config)
             sys.exit(0)
