@@ -1,50 +1,26 @@
-=====================================================
-sphinxcontrib-versioning (with Oro Doc modifications)
-=====================================================
-
-Oro Doc modifications
----------------------
-
-This modification includes next changes:
-
-* Added `version_dirs` configuration option which allows to set name of destination directory for specific version (before branch name has been used)
-* Added `vpathto_or_none` function to Jinja2 context and use it when passing branch/tag versions to template. If document is not present in specific version then this version will not be added and displayed on UI for this document
-* Added `scv_root_ref` variable to Jinja2 context with ref name of the root
-* Added `oro_current_version` variable to Jinja2 context with version name processed by "version_dirs" configuration
-* Added `oro_version_dirs` variable to Jinja2 context with an array of `version_dirs` config option
-* Added `-R/--reuse-root` option to `build` command which allows to reuse existing root instead of additional building separate directory for root version.
-* Fixed bug related to warnings during executing git commands (see https://github.com/sphinx-contrib/sphinxcontrib-versioning/pull/71)
-* Added `-F/--stop-on-fail` option to stop execution in case of error during versions building
-* Added `version_human_readable_names` configuration option which allows to set human readable version name for specific version based on branch name
-* Added `oro_version_human_readable_names` variable to Jinja2 context with an array of `version_human_readable_names` config option
-* Added `build_args_per_version` configuration option which allows to set custom sphinx-build arguments per versions
-
-General
--------
+===============
+sphinx-versions
+===============
 
 Sphinx extension that allows building versioned docs for self-hosting.
 
-* Python 2.7, 3.3, 3.4, and 3.5 supported on Linux and OS X.
-* Python 2.7, 3.3, 3.4, and 3.5 supported on Windows (both 32 and 64 bit versions of Python).
+* Python 3.4, and 3.5 supported on Linux and OS X.
+* Python 3.4, and 3.5 supported on Windows (both 32 and 64 bit versions of Python).
 
-📖 Full documentation: https://sphinxcontrib-versioning.readthedocs.io
+Full documentation: https://sphinx-versions.readthedocs.io
 
-Quickstart
+This project is, for the most part, a fork of https://github.com/Robpol86/sphinxcontrib-versioning, with some additions and removals.
+
+How to use
 ==========
 
-Install:
+Most basic usage:
 
 .. code:: bash
 
-    pip install sphinxcontrib-versioning
+    sphinx-versions --help
+    sphinx-versions build --help
 
-Usage:
-
-.. code:: bash
-
-    sphinx-versioning --help
-    sphinx-versioning build --help
-    sphinx-versioning push --help
 
 .. changelog-section-start
 
@@ -53,125 +29,44 @@ Changelog
 
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-2.2.1 - 2016-12-10
+1.1.3 - 2019-07-18
 ------------------
 
-Added
-    * Time value of ``html_last_updated_fmt`` will be the last git commit (authored) date.
+Changes
+    * Fix pdf copy target directory
 
-Fixed
-    * Unhandled KeyError exception when banner main ref fails pre-build.
-    * https://github.com/sphinx-contrib/sphinxcontrib-versioning/issues/26
-    * https://github.com/sphinx-contrib/sphinxcontrib-versioning/issues/27
-
-2.2.0 - 2016-09-15
+1.1.2 - 2019-07-18
 ------------------
 
-Added
-    * Windows support.
+Changes
+    * Removes the rest of `unicode` function calls
 
-Fixed
-    * https://github.com/sphinx-contrib/sphinxcontrib-versioning/issues/17
-    * https://github.com/sphinx-contrib/sphinxcontrib-versioning/issues/3
-
-2.1.4 - 2016-09-03
+1.1.1 - 2019-07-18
 ------------------
 
-Fixed
-    * banner.css being overridden by conf.py: https://github.com/sphinx-contrib/sphinxcontrib-versioning/issues/23
+Changes
+    * Removes compatibility with Python 2 (and make it work properly on Pyhton 3 : removing a call to `unicode` function)
 
-2.1.3 - 2016-08-24
+1.1.0 - 2019-07-18
 ------------------
 
-Fixed
-    * Stopped blocking users from overriding their layout.html. Using another approach to inserting the banner.
+Changes
+    * Add `-P pdf-file-name.pdf` option, thanks to `Anybotics fork <https://github.com/ANYbotics/sphinx-versions>`
 
-2.1.2 - 2016-08-24
+
+1.0.1 - 2019-04-23
 ------------------
 
-Fixed
-    * Cloning from push remote instead of origin. If HTML files are pushed to another repo other than origin it doesn't
-      make sense to clone from origin (previous files won't be available).
+Changes
+    * Update sphinx version from 1.8.4 to 1.8.5
 
-2.1.1 - 2016-08-23
+1.0.0 - 2018-12-08
 ------------------
 
-Added
-    * Command line option: ``--push-remote``
-
-Fixed
-    * Copy all remotes from the original repo to the temporarily cloned repo when pushing built docs to a remote.
-      Carries over all remote URLs in case user defines a different URL for push vs fetch.
-
-2.1.0 - 2016-08-22
-------------------
-
-Added
-    * Option to enable warning banner in old/development versions. Similar to Jinja2's documentation.
-    * Command line options: ``--banner-greatest-tag`` ``--banner-recent-tag`` ``--show-banner`` ``--banner-main-ref``
-    * Jinja2 context functions: ``vhasdoc()`` ``vpathto()``
-    * Jinja2 context variables: ``scv_show_banner`` ``scv_banner_greatest_tag`` ``scv_banner_main_ref_is_branch``
-      ``scv_banner_main_ref_is_tag`` ``scv_banner_main_version`` ``scv_banner_recent_tag``
-
-Changed
-    * Root ref will also be built in its own directory like other versions. All URLs to root ref will point to the one
-      in that directory instead of the root. More info: https://github.com/sphinx-contrib/sphinxcontrib-versioning/issues/15
-    * Renamed Jinja2 context variable ``scv_is_root_ref`` to ``scv_is_root``.
-
-Fixed
-    * https://github.com/sphinx-contrib/sphinxcontrib-versioning/issues/13
-    * https://github.com/sphinx-contrib/sphinxcontrib-versioning/pull/20
-
-Removed
-    * Jinja2 context variables: ``scv_root_ref_is_branch`` ``scv_root_ref_is_tag``
-
-2.0.0 - 2016-08-15
-------------------
-
-Added
-    * ``--git-root`` command line option.
-    * ``--whitelist-branches`` and ``--whitelist-tags`` command line options.
-    * ``--local-conf`` and ``--no-local-conf`` command line options.
-    * Load settings from **conf.py** file and command line arguments instead of just the latter.
-
-Changed
-    * Renamed command line option ``--prioritize`` to ``--priority``.
-    * Renamed command line option ``-S`` to ``-s``.
-    * ``--chdir``, ``--no-colors``, and ``--verbose`` must be specified before build/push and the other after.
-    * ``--sort`` no longer takes a comma separated string. Now specify multiple times (like ``--grm-exclude``).
-    * Renamed ``--sort`` value "chrono" to "time".
-    * Reordered positional command line arguments. Moved ``REL_SOURCE`` before the destination arguments.
-    * Renamed command line option ``-C`` to ``-N`` for consistency with sphinx-build.
-
-Fixed
-    * Exposing sphinx-build verbosity to SCVersioning. Specify one ``-v`` to make SCVersioning verbose and two or more
-      to make sphinx-build verbose.
-    * Using ``--no-colors`` also turns off colors from sphinx-build.
-    * https://github.com/sphinx-contrib/sphinxcontrib-versioning/issues/16
-
-1.1.0 - 2016-08-07
-------------------
-
-Added
-    * Exposing Jinja2 context variables: ``scv_is_branch`` ``scv_is_root_ref`` ``scv_is_tag`` ``scv_root_ref_is_branch``
-      ``scv_root_ref_is_tag`` ``scv_is_greatest_tag`` ``scv_is_recent_branch`` ``scv_is_recent_ref``
-      ``scv_is_recent_tag``
-
-Changed
-    * Version links point to that version of the current page if it exists there.
-
-Fixed
-    * https://github.com/sphinx-contrib/sphinxcontrib-versioning/issues/5
-
-1.0.1 - 2016-08-02
-------------------
-
-Fixed
-    * easy_install: https://github.com/sphinx-contrib/sphinxcontrib-versioning/issues/4
-
-1.0.0 - 2016-07-23
-------------------
-
-* Initial release.
+Changes
+    * From *sphinxcontrib-versionning* *v2.2.1*, added compatibility with *Sphinx 1.8.2*.
+    * From *sphinxcontrib-versionning* *v2.2.1*, removed `push` commands, considered not core for our own usage.
+    * Migrates to ``pipenv`` as the recommanded installation process.
+    * Use `-s` option instead of `--no-patch` in `git show` (this is for git 1.8.3.1 compatibility).
 
 .. changelog-section-end

@@ -37,11 +37,9 @@ class Config(object):
         self.git_root = None
         self.local_conf = None
         self.priority = None
-        self.push_remote = 'origin'
         self.root_ref = 'master'
 
         # Tuples.
-        self.grm_exclude = tuple()
         self.overflow = tuple()
         self.sort = tuple()
         self.whitelist_branches = tuple()
@@ -54,6 +52,9 @@ class Config(object):
 
         # Integers.
         self.verbose = 0
+
+        # Custom.
+        self.pdf_file = None # Name of the pdf
 
     def __contains__(self, item):
         """Implement 'key in Config'.

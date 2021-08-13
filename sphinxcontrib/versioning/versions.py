@@ -1,6 +1,7 @@
 """Collect and sort version strings."""
 
 import re
+import os
 
 RE_SEMVER = re.compile(r'^v?V?(\d+)(?:\.(\d+))?(?:\.(\d+))?(?:\.(\d+))?(?:\.(\d+))?(?:\.(\d+))?(?:\.(\d+))?([\w.+-]*)$')
 
@@ -98,7 +99,7 @@ class Versions(object):
     :ivar dict recent_tag_remote: Most recently committed tag.
     """
 
-    def __init__(self, remotes, sort=None, priority=None, invert=False, version_dirs=None,
+    def __init__(self, remotes, sort=None, priority=None, invert=False, pdf_file=None, version_dirs=None,
                  version_human_readable_names=None, reuse_root=False):
         """Constructor.
 
@@ -135,6 +136,7 @@ class Versions(object):
         self.recent_branch_remote = None
         self.recent_remote = None
         self.recent_tag_remote = None
+        self.pdf_file = pdf_file
         self.reuse_root = reuse_root
 
         # Sort one or more times.
@@ -211,25 +213,25 @@ class Versions(object):
 
     @property
     def branches(self):
-        """Return list of (name and urls) only branches."""
+        """Return list of (name and urls, pdf_urls) only branches."""
         branches = []
         for r in self.remotes:
             if r['kind'] == 'heads':
                 path = self.vpathto_or_none(r['name'])
                 if path is not None:
-                    branches.append((r['name'], r['human_readable_name'], path, r['root_dir']))
+                    branches.append((r['name'], r['human_readable_name'], path, self.pathtopdf(r['name']), r['root_dir']))
 
         return branches
 
     @property
     def tags(self):
-        """Return list of (name and urls) only tags."""
+        """Return list of (name and urls, pdf_urls) only tags."""
         tags = []
         for r in self.remotes:
             if r['kind'] == 'tags':
                 path = self.vpathto_or_none(r['name'])
                 if path is not None:
-                    tags.append((r['name'], r['human_readable_name'], path, r['root_dir']))
+                    tags.append((r['name'], r['human_readable_name'], path, self.pathtopdf(r['name']), r['root_dir']))
 
         return tags
 
@@ -278,13 +280,9 @@ class Versions(object):
 
     def vpathto_or_none(self, other_version):
         """Return relative path to current document in another version. Like Sphinx's pathto().
-
         If the current document doesn't exist in the other version None will be returned instead.
-
         :raise KeyError: If other_version doesn't exist.
-
         :param str other_version: Version to link to.
-
         :return: Relative path or None
         :rtype: str|None
         """
@@ -297,3 +295,17 @@ class Versions(object):
             return None
 
         return self.vpathto(other_version)
+
+    def pathtopdf(self, other_version):
+        is_root = self.context['scv_is_root']
+        pagename = self.context['pagename']
+        # if self.context['current_version'] == other_version and not is_root:
+        #     return '{}.html'.format(pagename.split('/')[-1])
+
+        other_remote = self[other_version]
+        other_root_dir = other_remote['root_dir']
+        components = ['..'] * pagename.count('/')
+        components += [other_root_dir] if is_root else ['..', other_root_dir]
+        components += ["_static"]
+        components += [os.path.splitext(self.pdf_file)[0]]
+        return '{}.pdf'.format(__import__('posixpath').join(*components))

@@ -5,8 +5,10 @@ import logging
 import multiprocessing
 import os
 import sys
+from shutil import copyfile, rmtree
 
-from sphinx import application, build_main, locale
+from sphinx import application, locale
+from sphinx.cmd.build import build_main, make_main
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.config import Config as SphinxConfig
 from sphinx.errors import SphinxError
@@ -51,17 +53,23 @@ class EventHandlers(object):
         """
         # Add this extension's _templates directory to Sphinx.
         templates_dir = os.path.join(os.path.dirname(__file__), '_templates')
-        app.builder.templates.pathchain.insert(0, templates_dir)
-        app.builder.templates.loaders.insert(0, SphinxFileSystemLoader(templates_dir))
-        app.builder.templates.templatepathlen += 1
+        if app.builder.name != "latex":
+            app.builder.templates.pathchain.insert(0, templates_dir)
+            app.builder.templates.loaders.insert(0, SphinxFileSystemLoader(templates_dir))
+            app.builder.templates.templatepathlen += 1
 
-        config = Config.from_context()
-        app.scv_is_root = cls.IS_ROOT
-        app.scv_oro_current_version = config.version_dirs.get(cls.CURRENT_VERSION, cls.CURRENT_VERSION)
+            config = Config.from_context()
+            app.scv_is_root = cls.IS_ROOT
+            app.scv_oro_current_version = config.version_dirs.get(cls.CURRENT_VERSION, cls.CURRENT_VERSION)
 
         # Add versions.html to sidebar.
         if '**' not in app.config.html_sidebars:
-            app.config.html_sidebars['**'] = StandaloneHTMLBuilder.default_sidebars + ['versions.html']
+            # default_sidebars was deprecated in Sphinx 1.6+, so only use it if possible (to maintain
+            # backwards compatibility), else don't use it.
+            try:
+                app.config.html_sidebars['**'] = StandaloneHTMLBuilder.default_sidebars + ['versions.html']
+            except AttributeError:
+                app.config.html_sidebars['**'] = ['versions.html']
         elif 'versions.html' not in app.config.html_sidebars['**']:
             app.config.html_sidebars['**'].append('versions.html')
 
@@ -142,7 +150,7 @@ class EventHandlers(object):
             if os.path.isfile(file_path):
                 lufmt = app.config.html_last_updated_fmt or getattr(locale, '_')('%b %d, %Y')
                 mtime = datetime.datetime.fromtimestamp(os.path.getmtime(file_path))
-                context['last_updated'] = format_date(lufmt, mtime, language=app.config.language, warn=app.warn)
+                context['last_updated'] = format_date(lufmt, mtime, language=app.config.language)
 
 
 def setup(app):
@@ -174,9 +182,9 @@ def setup(app):
 class ConfigInject(SphinxConfig):
     """Inject this extension info self.extensions. Append after user's extensions."""
 
-    def __init__(self, dirname, filename, overrides, tags):
+    def __init__(self, *args):
         """Constructor."""
-        super(ConfigInject, self).__init__(dirname, filename, overrides, tags)
+        super(ConfigInject, self).__init__(*args)
         self.extensions.insert(0, 'sphinxcontrib.versioning.sphinx_')
 
 
@@ -213,6 +221,21 @@ def _build(argv, config, versions, current_name, is_root):
 
     # Build.
     result = build_main(argv)
+
+    if result != 0:
+        raise SphinxError
+
+    # Build pdf if required
+    if config.pdf_file:
+        args = list(argv)
+        args.insert(0,"latexpdf")   # Builder type
+        args.insert(0,"ignore")     # Will be ignored
+        result = make_main(args)
+        # Copy to _static dir of src
+        latexDir = argv[1] + "/latex/";
+        copyfile( latexDir + config.pdf_file, argv[1] + "/_static/" + config.pdf_file)
+        rmtree(latexDir)
+
     if result != 0:
         raise SphinxError
 
@@ -244,9 +267,12 @@ def build(source, target, versions, current_name, is_root):
     :param bool is_root: Is this build in the web root?
     """
     log = logging.getLogger(__name__)
-    argv = ('sphinx-build', source, target)
+    argv = (source, target)
     config = Config.from_context()
+    multiprocessing.log_to_stderr()
 
+    logger = multiprocessing.get_logger()
+    logger.setLevel(logging.INFO)
     log.debug('Running sphinx-build for %s with args: %s', current_name, str(argv))
     child = multiprocessing.Process(target=_build, args=(argv, config, versions, current_name, is_root))
     child.start()
@@ -270,9 +296,19 @@ def read_config(source, current_name):
     log = logging.getLogger(__name__)
     queue = multiprocessing.Queue()
     config = Config.from_context()
+    multiprocessing.log_to_stderr()
+
+    logger = multiprocessing.get_logger()
+    logger.setLevel(logging.INFO)
 
     with TempDir() as temp_dir:
-        argv = ('sphinx-build', source, temp_dir)
+        argv = (source, temp_dir)
+        print(temp_dir)
+        print(argv)
+        print(config)
+        print(current_name)
+        print(queue)
+        print('---------------------------')
         log.debug('Running sphinx-build for config values with args: %s', str(argv))
         child = multiprocessing.Process(target=_read_config, args=(argv, config, current_name, queue))
         child.start()

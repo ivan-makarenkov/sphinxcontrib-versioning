@@ -7,19 +7,20 @@ Settings
 .. code-block:: bash
 
     sphinx-versioning [GLOBAL_OPTIONS] build [OPTIONS] REL_SOURCE... DESTINATION
-    sphinx-versioning [GLOBAL_OPTIONS] push [OPTIONS] REL_SOURCE... DEST_BRANCH REL_DEST
 
-SCVersioning reads settings from two sources:
+sphinx-versions reads settings from two sources:
 
 * Your Sphinx **conf.py** file.
 * Command line arguments.
 
 Command line arguments always override anything set in conf.py. You can specify the path to conf.py with the
-:option:`--local-conf` argument or SCVersioning will look at the first conf.py it finds in your :option:`REL_SOURCE`
+:option:`--local-conf` argument or sphinx-versions will look at the first conf.py it finds in your :option:`REL_SOURCE`
 directories. To completely disable using a conf.py file specify the :option:`--no-local-conf` command line argument.
 
-Below are both the command line arguments available as well as the conf.py variable names SCVersioning looks for. All
-conf.py variable names are prefixed with ``scv_``. An example:
+Below are both the command line arguments available as well as the conf.py variable names sphinx-versions looks for. All
+conf.py variable names are prefixed with ``scv_``.
+
+An example:
 
 .. code-block:: python
 
@@ -31,8 +32,7 @@ conf.py variable names are prefixed with ``scv_``. An example:
 Global Options
 ==============
 
-These options apply to to both :ref:`build <build-arguments>` and :ref:`push <push-arguments>` sub commands. They must
-be specified before the build/push command or else you'll get an error.
+These options apply to to :ref:`build <build-arguments>` sub commands. They must be specified before the build command or else you'll get an error.
 
 .. option:: -c <directory>, --chdir <directory>
 
@@ -44,14 +44,14 @@ be specified before the build/push command or else you'll get an error.
 
 .. option:: -l <file>, --local-conf <file>
 
-    Path to conf.py for SCVersioning to read its config from. Does not affect conf.py loaded by sphinx-build.
+    Path to conf.py for sphinx-versions  to read its config from. Does not affect conf.py loaded by sphinx-build.
 
-    If not specified the default behavior is to have SCVersioning look for a conf.py file in any :option:`REL_SOURCE`
+    If not specified the default behavior is to have sphinx-versions look for a conf.py file in any :option:`REL_SOURCE`
     directory within the current working directory. Stops at the first conf.py found if any.
 
 .. option:: -L, --no-local-conf
 
-    Disables searching for or loading a local conf.py for SCVersioning settings. Does not affect conf.py loaded by
+    Disables searching for or loading a local conf.py for sphinx-versions settings. Does not affect conf.py loaded by
     sphinx-build.
 
 .. option:: -N, --no-colors
@@ -69,7 +69,7 @@ be specified before the build/push command or else you'll get an error.
 Common Positional Arguments
 ===========================
 
-Both the :ref:`build <build-arguments>` and :ref:`push <push-arguments>` sub commands use these arguments.
+The :ref:`build <build-arguments>` sub commands use these arguments.
 
 .. option:: REL_SOURCE
 
@@ -83,7 +83,7 @@ Both the :ref:`build <build-arguments>` and :ref:`push <push-arguments>` sub com
 
 .. option:: --, scv_overflow
 
-    It is possible to give the underlying ``sphinx-build`` program command line options. SCVersioning passes everything
+    It is possible to give the underlying ``sphinx-build`` program command line options. sphinx-versions passes everything
     after ``--`` to it. For example if you changed the theme for your docs between versions and want docs for all
     versions to have the same theme, you can run:
 
@@ -145,6 +145,8 @@ These options are available for the build sub command:
     .. code-block:: python
 
         scv_banner_recent_tag = True
+
+.. _setting-show-banner:
 
 .. option:: -b, --show-banner, scv_show_banner
 
@@ -268,66 +270,3 @@ These options are available for the build sub command:
 
         scv_whitelist_tags = (re.compile(r'^v\d+\.\d+\.\d+$'),)
 
-.. _push-arguments:
-
-Push Arguments
-==============
-
-``push`` does the same as build and also attempts to push generated HTML files to a remote branch. It will retry up to
-three times in case of race conditions with other processes also trying to push files to the same branch (e.g. multiple
-Jenkins/Travis jobs).
-
-HTML files are committed to :option:`DEST_BRANCH` and pushed to :option:`--push-remote`.
-
-Positional Arguments
---------------------
-
-In addition to the :ref:`common arguments <common-positional-arguments>`:
-
-.. option:: DEST_BRANCH
-
-    The branch name where generated docs will be committed to. The branch will then be pushed to the remote specified in
-    :option:`--push-remote`. If there is a race condition with another job pushing to the remote the docs will be
-    re-generated and pushed again.
-
-    This must be a branch and not a tag. This also must already exist in the remote.
-
-.. option:: REL_DEST
-
-    The path to the directory that will hold all generated docs for all versions relative to the git roof of
-    DEST_BRANCH.
-
-    If you want your generated **index.html** to be at the root of :option:`DEST_BRANCH` you can just specify a period
-    (e.g. ``.``) for REL_DEST. If you want HTML files to be placed in say... "<git root>/html/docs", then you specify
-    "html/docs".
-
-Options
--------
-
-All :ref:`build options <build-options>` are valid for the push sub command. Additionally these options are available
-only for the push sub command:
-
-.. option:: -e <file>, --grm-exclude <file>, scv_grm_exclude
-
-    Causes "**git rm -rf $REL_DEST**" to run after checking out :option:`DEST_BRANCH` and then runs "git reset <file>"
-    to preserve it. All other files in the branch in :option:`REL_DEST` will be deleted in the commit. You can specify
-    multiple files or directories to be excluded by adding more ``--grm-exclude`` arguments.
-
-    If this argument is not specified then nothing will be deleted from the branch. This may cause stale/orphaned HTML
-    files in the branch if a branch is deleted from the repo after SCVersioning already created HTML files for it.
-
-    This setting may also be specified in your conf.py file. It must be a tuple of strings:
-
-    .. code-block:: python
-
-        scv_grm_exclude = ('README.md', '.gitignore')
-
-.. option:: -P <remote>, --push-remote <remote>, scv_push_remote
-
-    Push built docs to this remote. Default is **origin**.
-
-    This setting may also be specified in your conf.py file. It must be a string:
-
-    .. code-block:: python
-
-        scv_push_remote = 'origin2'

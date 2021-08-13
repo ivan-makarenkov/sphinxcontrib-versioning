@@ -4,35 +4,51 @@
 Installation
 ============
 
-Getting started is pretty simple. The first step is to install the library.
+.. _requirements-to-use:
 
-Pip Install
-===========
+Requirements
+============
 
-The easiest way to get SCVersioning is to use `pip <https://pip.pypa.io>`_. Simply run this command.
+Install Python & PIP & pipenv
+-----------------------------
+
+First, you need to install Python 3 and PIP (if not already present on your system):
+
+.. code-block:: shell
+
+   $ sudo apt-get install python3-pip
+
+You might need to update PIP right away
+
+.. code-block:: shell
+
+   $ pip3 install -U pip
+
+Then, install ``pipenv``
+
+.. code-block:: shell
+
+   $ pip install --user -U pipenv
+
+Installation
+============
+
+`pipenv` install
+----------------
+
+The suggested way to get `sphinx-versions` is to use `pipenv <https://pipenv.readthedocs.io>`_. Simply run this command, from your current project:
 
 .. code-block:: bash
 
-    pip install sphinxcontrib-versioning
-
-Latest from GitHub
-==================
-
-You can also elect to install the latest bleeding-edge version by using pip to install directly from the GitHub
-repository.
-
-.. code-block:: bash
-
-    pip install git+https://github.com/Robpol86/sphinxcontrib-versioning.git
+    pipenv install sphinx-versions
 
 Clone and Install
-=================
+-----------------
 
-Lastly you can also just clone the repo and install from it. Usually you only need to do this if you plan on
-`contributing <https://github.com/Robpol86/sphinxcontrib-versioning/blob/master/CONTRIBUTING.md>`_ to the project.
+Lastly you can also just clone the repo and install from it. Usually you only need to do this if you plan on :ref:`contributing <contributing>` to the project.
 
 .. code-block:: bash
 
-    git clone git@github.com:Robpol86/sphinxcontrib-versioning.git
-    cd sphinxcontrib-versioning
+    git clone git@github.com:Smile-SA/sphinx-versions.git
+    cd sphinx-versions
     python setup.py install

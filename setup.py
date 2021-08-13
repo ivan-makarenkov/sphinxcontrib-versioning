@@ -12,8 +12,8 @@ from setuptools import Command, setup
 IMPORT = 'sphinxcontrib.versioning'
 INSTALL_REQUIRES = ['click', 'colorclass', 'sphinx']
 LICENSE = 'MIT'
-NAME = 'sphinxcontrib-versioning'
-VERSION = '2.2.1'
+NAME = 'sphinx-versions'
+VERSION = '1.1.3'
 
 
 def readme(path='README.rst'):
@@ -26,10 +26,9 @@ def readme(path='README.rst'):
     """
     path = os.path.realpath(os.path.join(os.path.dirname(__file__), path))
     handle = None
-    url_prefix = 'https://raw.githubusercontent.com/Robpol86/{name}/v{version}/'.format(name=NAME, version=VERSION)
     try:
         handle = codecs.open(path, encoding='utf-8')
-        return handle.read(131072).replace('.. image:: docs', '.. image:: {0}docs'.format(url_prefix))
+        return handle.read(131072)
     except IOError:
         return ''
     finally:
@@ -37,7 +36,7 @@ def readme(path='README.rst'):
 
 
 class CheckVersion(Command):
-    """Make sure version strings and other metadata match here, in module/package, tox, and other places."""
+    """Make sure version strings and other metadata match here, in module/package, and other places."""
 
     description = 'verify consistent version/etc strings in project'
     user_options = []
@@ -56,27 +55,18 @@ class CheckVersion(Command):
     def run(cls):
         """Check variables."""
         project = __import__(IMPORT, fromlist=[''])
-        for expected, var in [('@Robpol86', '__author__'), (LICENSE, '__license__'), (VERSION, '__version__')]:
+        for expected, var in [(LICENSE, '__license__'), (VERSION, '__version__')]:
             if getattr(project, var) != expected:
                 raise SystemExit('Mismatch: {0}'.format(var))
         # Check changelog.
         if not re.compile(r'^%s - \d{4}-\d{2}-\d{2}[\r\n]' % VERSION, re.MULTILINE).search(readme()):
             raise SystemExit('Version not found in readme/changelog file.')
-        # Check tox.
-        if INSTALL_REQUIRES:
-            contents = readme('tox.ini')
-            section = re.compile(r'[\r\n]+install_requires =[\r\n]+(.+?)[\r\n]+\w', re.DOTALL).findall(contents)
-            if not section:
-                raise SystemExit('Missing install_requires section in tox.ini.')
-            in_tox = re.findall(r'    ([^=]+)==[\w\d.-]+', section[0])
-            if INSTALL_REQUIRES != in_tox:
-                raise SystemExit('Missing/unordered pinned dependencies in tox.ini.')
 
 
 if __name__ == '__main__':
     setup(
-        author='@Robpol86',
-        author_email='robpol86@gmail.com',
+        author='Smile',
+        author_email='cyrille.gachot@smile.fr',
         classifiers=[
             'Development Status :: 5 - Production/Stable',
             'Environment :: Console',
@@ -86,7 +76,6 @@ if __name__ == '__main__':
             'Operating System :: MacOS',
             'Operating System :: POSIX :: Linux',
             'Operating System :: POSIX',
-            'Programming Language :: Python :: 2.7',
             'Programming Language :: Python :: 3.3',
             'Programming Language :: Python :: 3.4',
             'Programming Language :: Python :: 3.5',
@@ -109,7 +98,7 @@ if __name__ == '__main__':
             os.path.join('_templates', 'versions.html'),
         ]},
         packages=['sphinxcontrib', os.path.join('sphinxcontrib', 'versioning')],
-        url='https://github.com/Robpol86/' + NAME,
+        url='https://github.com/Smile-SA/' + NAME,
         version=VERSION,
         zip_safe=False,
     )

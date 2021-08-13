@@ -74,7 +74,7 @@ def gather_git_info(root, conf_rel_paths, whitelist_branches, whitelist_tags):
                 log.error(exc.output)
                 raise HandledError
     except subprocess.CalledProcessError as exc:
-        log.debug(json.dumps(dict(command=exc.cmd, cwd=root, code=exc.returncode, output=exc.output)))
+        log.error(json.dumps(dict(command=exc.cmd, cwd=root, code=exc.returncode, output=exc.output)))
         log.error('Failed to get dates for all remote commits.')
         raise HandledError
     filtered_remotes = [[i[0], i[1], i[2], ] + dates_paths[i[0]] for i in remotes if i[0] in dates_paths]
@@ -145,7 +145,7 @@ def pre_build(local_root, versions):
         source = os.path.dirname(os.path.join(exported_root, remote['sha'], remote['conf_rel_path']))
         try:
             config = read_config(source, remote['name'])
-        except HandledError, e:
+        except HandledError as e:
             log.warning('Skipping. Will not be building: %s', remote['name'])
             versions.remotes.pop(versions.remotes.index(remote))
             if current_config.stop_on_fail:
@@ -170,8 +170,7 @@ def build_all(exported_root, destination, versions):
         config = Config.from_context()
 
         # Build root.
-        root_remote = versions[config.root_ref]
-
+        remote = versions[config.root_ref]
         log.info('Building root: %s', root_remote['name'])
         source = os.path.dirname(os.path.join(exported_root, root_remote['sha'], root_remote['conf_rel_path']))
         build(source, destination, versions, root_remote['name'], True)
@@ -187,7 +186,7 @@ def build_all(exported_root, destination, versions):
             target = os.path.join(destination, remote['root_dir'])
             try:
                 build(source, target, versions, remote['name'], False)
-            except HandledError, e:
+            except HandledError as e:
                 log.warning('Skipping. Will not be building %s. Rebuilding everything.', remote['name'])
                 versions.remotes.pop(versions.remotes.index(remote))
                 if config.stop_on_fail:

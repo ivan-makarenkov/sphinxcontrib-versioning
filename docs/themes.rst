@@ -7,45 +7,50 @@ Supported Themes
 Below are screen shots of the supported built-in Sphinx themes. You can the "Versions" section in each screen shot on
 sidebars.
 
-If your theme isn't here you can either `create a pull request <https://github.com/Robpol86/sphinxcontrib-versioning/>`_
-or add support for SCVersioning using :ref:`context`.
+sphinx_rtd_theme
+----------------
 
 .. figure:: screenshots/sphinx_rtd_theme.png
     :target: _images/sphinx_rtd_theme.png
 
-    sphinx_rtd_theme
+alabaster
+---------
 
 .. figure:: screenshots/alabaster.png
     :target: _images/alabaster.png
 
-    alabaster
+classic
+-------
 
 .. figure:: screenshots/classic.png
     :target: _images/classic.png
 
-    classic
+nature
+------
 
 .. figure:: screenshots/nature.png
     :target: _images/nature.png
 
-    nature
+sphinxdoc
+---------
 
 .. figure:: screenshots/sphinxdoc.png
     :target: _images/sphinxdoc.png
 
-    sphinxdoc
+bizstyle
+--------
 
 .. figure:: screenshots/bizstyle.png
     :target: _images/bizstyle.png
 
-    bizstyle
+pyramid
+-------
 
 .. figure:: screenshots/pyramid.png
     :target: _images/pyramid.png
 
-    pyramid
+traditional
+-----------
 
 .. figure:: screenshots/traditional.png
     :target: _images/traditional.png
-
-    traditional

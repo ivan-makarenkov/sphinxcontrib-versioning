@@ -8,7 +8,7 @@ import time
 import click
 
 from sphinxcontrib.versioning import __version__
-from sphinxcontrib.versioning.git import clone, commit_and_push, get_root, GitError
+from sphinxcontrib.versioning.git import clone, get_root, GitError
 from sphinxcontrib.versioning.lib import Config, HandledError, TempDir
 from sphinxcontrib.versioning.routines import build_all, gather_git_info, pre_build, read_local_conf
 from sphinxcontrib.versioning.setup_logging import setup_logging
@@ -112,7 +112,7 @@ class ClickCommand(click.Command):
 @click.group(cls=ClickGroup)
 @click.option('-c', '--chdir', help='Make this the current working directory before running.', type=IS_EXISTS_DIR)
 @click.option('-g', '--git-root', help='Path to directory in the local repo. Default is CWD.', type=IS_EXISTS_DIR)
-@click.option('-l', '--local-conf', help='Path to conf.py for SCVersioning to read config from.', type=IS_EXISTS_FILE)
+@click.option('-l', '--local-conf', help='Path to conf.py for sphinx-versions to read config from.', type=IS_EXISTS_FILE)
 @click.option('-L', '--no-local-conf', help="Don't attempt to search for nor load a local conf.py file.", is_flag=True)
 @click.option('-N', '--no-colors', help='Disable colors in the terminal output.', is_flag=True)
 @click.option('-v', '--verbose', help='Debug logging. Specify more than once for more logging.', count=True)
@@ -121,8 +121,8 @@ class ClickCommand(click.Command):
 def cli(config, **options):
     """Build versioned Sphinx docs for every branch and tag pushed to origin.
 
-    Supports only building locally with the "build" sub command or build and push to a remote with the "push" sub
-    command. For more information for either run them with their own --help.
+    Supports only building locally with the "build" sub command
+    For more information, run with its own --help.
 
     The options below are global and must be specified before the sub command name (e.g. -N build ...).
     \f
@@ -130,7 +130,6 @@ def cli(config, **options):
     :param sphinxcontrib.versioning.lib.Config config: Runtime configuration.
     :param dict options: Additional Click options.
     """
-
     def pre(rel_source):
         """To be executed in a Click sub command.
 
@@ -170,7 +169,6 @@ def cli(config, **options):
         elif os.path.basename(config.local_conf) != 'conf.py':
             log.error('Path "%s" must end with conf.py.', config.local_conf)
             raise HandledError
-
     config['pre'] = pre  # To be called by Click sub commands.
     config.update(options)
 
@@ -209,7 +207,8 @@ def build_options(func):
                         help='Whitelist branches that match the pattern. Can be specified more than once.')(func)
     func = click.option('-W', '--whitelist-tags', multiple=True,
                         help='Whitelist tags that match the pattern. Can be specified more than once.')(func)
-
+    func = click.option('-P', '--pdf-file',
+                        help='Name of the generated PDF file.')(func)
     return func
 
 
@@ -248,7 +247,7 @@ def override_root_main_ref(config, remotes, banner):
 def build(config, rel_source, destination, **options):
     """Fetch branches/tags and build all locally.
 
-    Doesn't push anything to remote. Just fetch all remote branches and tags, export them to a temporary directory, run
+    Just fetch all remote branches and tags, export them to a temporary directory, run
     sphinx-build on each one, and then store all built documentation in DESTINATION.
 
     REL_SOURCE is the path to the docs directory relative to the git root. If the source directory has moved around
@@ -286,6 +285,7 @@ def build(config, rel_source, destination, **options):
         sort=config.sort,
         priority=config.priority,
         invert=config.invert,
+        pdf_file=config.pdf_file,
         version_dirs=config.version_dirs,
         version_human_readable_names=config.version_human_readable_names,
         reuse_root=config.reuse_root,
@@ -325,80 +325,3 @@ def build(config, rel_source, destination, **options):
 
     # Store versions in state for push().
     config['versions'] = versions
-
-
-@cli.command(cls=ClickCommand)
-@build_options
-@click.option('-e', '--grm-exclude', multiple=True,
-              help='If specified "git rm" will delete all files in REL_DEST except for these. Specify multiple times '
-                   'for more. Paths are relative to REL_DEST in DEST_BRANCH.')
-@click.option('-P', '--push-remote', help='Push built docs to this remote. Default is origin.')
-@click.argument('REL_SOURCE', nargs=-1, required=True)
-@click.argument('DEST_BRANCH')
-@click.argument('REL_DEST')
-@click.make_pass_decorator(Config)
-@click.pass_context
-def push(ctx, config, rel_source, dest_branch, rel_dest, **options):
-    """Build locally and then push to remote branch.
-
-    First the build sub command is invoked which takes care of building all versions of your documentation in a
-    temporary directory. If that succeeds then all built documents will be pushed to a remote branch.
-
-    REL_SOURCE is the path to the docs directory relative to the git root. If the source directory has moved around
-    between git tags you can specify additional directories.
-
-    DEST_BRANCH is the branch name where generated docs will be committed to. The branch will then be pushed to remote.
-    If there is a race condition with another job pushing to remote the docs will be re-generated and pushed again.
-
-    REL_DEST is the path to the directory that will hold all generated docs for all versions relative to the git roof of
-    DEST_BRANCH.
-
-    To pass options to sphinx-build (run for every branch/tag) use a double hyphen
-    (e.g. push docs gh-pages . -- -D setting=value).
-    \f
-
-    :param click.core.Context ctx: Click context.
-    :param sphinxcontrib.versioning.lib.Config config: Runtime configuration.
-    :param tuple rel_source: Possible relative paths (to git root) of Sphinx directory containing conf.py (e.g. docs).
-    :param str dest_branch: Branch to clone and push to.
-    :param str rel_dest: Relative path (to git root) to write generated docs to.
-    :param dict options: Additional Click options.
-    """
-    if 'pre' in config:
-        config.pop('pre')(rel_source)
-        config.update({k: v for k, v in options.items() if v})
-        if config.local_conf:
-            config.update(read_local_conf(config.local_conf), ignore_set=True)
-    if NO_EXECUTE:
-        raise RuntimeError(config, rel_source, dest_branch, rel_dest)
-    log = logging.getLogger(__name__)
-
-    # Clone, build, push.
-    for _ in range(PUSH_RETRIES):
-        with TempDir() as temp_dir:
-            log.info('Cloning %s into temporary directory...', dest_branch)
-            try:
-                clone(config.git_root, temp_dir, config.push_remote, dest_branch, rel_dest, config.grm_exclude)
-            except GitError as exc:
-                log.error(exc.message)
-                log.error(exc.output)
-                raise HandledError
-
-            log.info('Building docs...')
-            ctx.invoke(build, rel_source=rel_source, destination=os.path.join(temp_dir, rel_dest))
-            versions = config.pop('versions')
-
-            log.info('Attempting to push to branch %s on remote repository.', dest_branch)
-            try:
-                if commit_and_push(temp_dir, config.push_remote, versions):
-                    return
-            except GitError as exc:
-                log.error(exc.message)
-                log.error(exc.output)
-                raise HandledError
-        log.warning('Failed to push to remote repository. Retrying in %d seconds...', PUSH_SLEEP)
-        time.sleep(PUSH_SLEEP)
-
-    # Failed if this is reached.
-    log.error('Ran out of retries, giving up.')
-    raise HandledError

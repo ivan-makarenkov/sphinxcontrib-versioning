@@ -4,11 +4,13 @@ import os
 import sys
 import time
 
+# -- Project information -----------------------------------------------------
+
+copyright = '2018, Smile'
+author = 'Smile'
 
 # General configuration.
 sys.path.append(os.path.realpath(os.path.join(os.path.dirname(__file__), '..')))
-author = '@Robpol86'
-copyright = '{}, {}'.format(time.strftime('%Y'), author)
 html_last_updated_fmt = '%c'
 master_doc = 'index'
 project = __import__('setup').NAME
@@ -21,20 +23,16 @@ extensions = list()
 # Options for HTML output.
 html_context = dict(
     conf_py_path='/docs/',
-    display_github=True,
-    github_repo=os.environ.get('TRAVIS_REPO_SLUG', '/' + project).split('/', 1)[1],
-    github_user=os.environ.get('TRAVIS_REPO_SLUG', 'robpol86/').split('/', 1)[0],
-    github_version=os.environ.get('TRAVIS_BRANCH', 'master'),
     source_suffix='.rst',
 )
 html_copy_source = False
-html_favicon = 'favicon.ico'
+html_favicon='_static/Favicon_logo_Smile.png'
+html_logo=''
 html_theme = 'sphinx_rtd_theme'
 html_title = project
 
 
-# SCVersioning.
+# sphinx-versions
 scv_banner_greatest_tag = True
-scv_grm_exclude = ('.gitignore', '.nojekyll', 'README.rst')
 scv_show_banner = True
 scv_sort = ('semver', 'time')

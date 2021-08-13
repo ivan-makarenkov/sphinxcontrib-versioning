@@ -146,7 +146,7 @@ def run_command(local_root, command, env_var=True, pipeto=None, retry=0, environ
             main_output = main.communicate()[1].decode('utf-8')  # Might deadlock if stderr is written to a lot.
         else:
             main_output = main.communicate()[0].decode('utf-8')
-    # log.debug(json.dumps(dict(cwd=local_root, command=command, code=main.poll(), output=main_output)))
+    #log.debug(json.dumps(dict(cwd=local_root, command=command, code=main.poll(), output=main_output)))
 
     # Verify success.
     if main.poll() != 0:
@@ -237,7 +237,7 @@ def filter_and_date(local_root, conf_rel_paths, commits):
             dates_paths[commit] = [None, output.splitlines()[0].strip()]
 
     # Get timestamps by groups of 50.
-    command_prefix = ['git', 'show', '--no-patch', '--pretty=format:%ct']
+    command_prefix = ['git', 'show', '-s', '--pretty=format:%ct']
     for commits_group in chunk(dates_paths, 50):
         command = command_prefix + commits_group
         output = run_command(local_root, command)
@@ -295,7 +295,7 @@ def export(local_root, commit, target):
         try:
             with tarfile.open(fileobj=stdout, mode='r|') as tar:
                 for info in tar:
-                    # log.debug('name: %s; mode: %d; size: %s; type: %s', info.name, info.mode, info.size, info.type)
+                    #log.debug('name: %s; mode: %d; size: %s; type: %s', info.name, info.mode, info.size, info.type)
                     path = os.path.realpath(os.path.join(target, info.name))
                     if not path.startswith(target):  # Handle bad paths.
                         log.warning('Ignoring tar object path %s outside of target directory.', info.name)
@@ -308,7 +308,8 @@ def export(local_root, commit, target):
                         tar.extract(member=info, path=target)
                         if os.path.splitext(info.name)[1].lower() == '.rst':
                             mtimes.append(info.name)
-                for info in (i for i in queued_links if os.path.exists(os.path.join(target, i.linkname))):
+                for info in queued_links:
+                    # There used to be a check for broken symlinks here, but it was buggy
                     tar.extract(member=info, path=target)
         except tarfile.TarError as exc:
             log.debug('Failed to extract output from "git archive" command: %s', str(exc))
@@ -390,68 +391,3 @@ def clone(local_root, new_root, remote, branch, rel_dest, exclude):
     run_command(new_root, ['git', 'checkout', '--'] + exclude_joined)
 
 
-def commit_and_push(local_root, remote, versions):
-    """Commit changed, new, and deleted files in the repo and attempt to push the branch to the remote repository.
-
-    :raise CalledProcessError: Unhandled git command failure.
-    :raise GitError: Conflicting changes made in remote by other client and bad git config for commits.
-
-    :param str local_root: Local path to git root directory.
-    :param str remote: The git remote to push to.
-    :param sphinxcontrib.versioning.versions.Versions versions: Versions class instance.
-
-    :return: If push succeeded.
-    :rtype: bool
-    """
-    log = logging.getLogger(__name__)
-    current_branch = run_command(local_root, ['git', 'rev-parse', '--abbrev-ref', 'HEAD']).strip()
-    run_command(local_root, ['git', 'add', '.'])
-
-    # Check if there are no changes.
-    try:
-        run_command(local_root, ['git', 'diff', 'HEAD', '--no-ext-diff', '--quiet', '--exit-code'])
-    except CalledProcessError:
-        pass  # Repo is dirty, something has changed.
-    else:
-        log.info('No changes to commit.')
-        return True
-
-    # Check if there are changes excluding those files that always change.
-    output = run_command(local_root, ['git', 'diff', 'HEAD', '--no-ext-diff', '--name-status'])
-    for status, name in (l.split('\t', 1) for l in output.splitlines()):
-        if status != 'M':
-            break  # Only looking for modified files.
-        components = name.split('/')
-        if '.doctrees' not in components and components[-1] != 'searchindex.js':
-            break  # Something other than those two dirs/files has changed.
-    else:
-        log.info('No significant changes to commit.')
-        return True
-
-    # Commit.
-    latest_commit = sorted(versions.remotes, key=lambda v: v['date'])[-1]
-    commit_message_file = os.path.join(local_root, '_scv_commit_message.txt')
-    with open(commit_message_file, 'w') as handle:
-        handle.write('AUTO sphinxcontrib-versioning {} {}\n\n'.format(
-            datetime.utcfromtimestamp(latest_commit['date']).strftime('%Y%m%d'),
-            latest_commit['sha'][:11],
-        ))
-        for line in ('{}: {}\n'.format(v, os.environ[v]) for v in WHITELIST_ENV_VARS if v in os.environ):
-            handle.write(line)
-    try:
-        run_command(local_root, ['git', 'commit', '-F', commit_message_file])
-    except CalledProcessError as exc:
-        raise GitError('Failed to commit locally.', exc.output)
-    os.remove(commit_message_file)
-
-    # Push.
-    try:
-        run_command(local_root, ['git', 'push', remote, current_branch])
-    except CalledProcessError as exc:
-        if '[rejected]' in exc.output and '(fetch first)' in exc.output:
-            log.debug('Remote has changed since cloning the repo. Must retry.')
-            return False
-        raise GitError('Failed to push to remote.', exc.output)
-
-    log.info('Successfully pushed to remote repository.')
-    return True
