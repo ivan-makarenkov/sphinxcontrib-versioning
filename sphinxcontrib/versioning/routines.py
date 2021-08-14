@@ -170,7 +170,7 @@ def build_all(exported_root, destination, versions):
         config = Config.from_context()
 
         # Build root.
-        remote = versions[config.root_ref]
+        root_remote = versions[config.root_ref]
         log.info('Building root: %s', root_remote['name'])
         source = os.path.dirname(os.path.join(exported_root, root_remote['sha'], root_remote['conf_rel_path']))
         build(source, destination, versions, root_remote['name'], True)
