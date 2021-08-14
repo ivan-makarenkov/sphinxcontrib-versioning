@@ -311,19 +311,8 @@ class Versions(object):
         components += [os.path.splitext(self.pdf_file)[0]]
         return '{}.pdf'.format(__import__('posixpath').join(*components))
 
-def multiple_replace(items, replace_list):
-	result = []
-	string = ''
-	for item in items:
-		for replace in replace_list:
-			item = item.replace(*replace)
-		result.append(item)
-	return result
-
 def decompress(items):
-	replace_list = (("i/", "include/"), ("cl/", "cloud/"), ("a/", "api/"), ("be/", "backend/"), ("u/", "user/"), ("bd/", "bundles/"), ("c/", "community/"), ("f/", "frontend/"))
-	return json.loads(multiple_replace(items, replace_list))
+	return json.loads(items)
 
 def compress(items):
-	replace_list = (("include/", "i/"), ("cloud/", "cl/"), ("api/", "a/"), ("backend/", "be/"), ("user/", "u/"), ("bundles/", "bd/"), ("community/", "c/"), ("frontend/", "f/"))
-	return json.dumps(multiple_replace(items, replace_list))
+	return json.dumps(items)
