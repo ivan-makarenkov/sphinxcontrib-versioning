@@ -315,14 +315,14 @@ def multiple_replace(items, replace_list):
 	string = ''
 	for item in items:
 		for replace in replace_list:
-			string = item.replace(*replace)
-		result.append(string)
+			item = item.replace(*replace)
+		result.append(item)
 	return result
 
 def decompress(items):
-	replace_list = (("be/", "backend/"), ("u/", "user/"), ("bd/", "bundles/"), ("c/", "community/"), ("f/", "frontend/"))
+	replace_list = (("i/", "include/"), ("cl/", "cloud/"), ("a/", "api/"), ("be/", "backend/"), ("u/", "user/"), ("bd/", "bundles/"), ("c/", "community/"), ("f/", "frontend/"))
 	return multiple_replace(items, replace_list)
 
 def compress(items):
-	replace_list = (("backend/", "be/"), ("user/", "u/"), ("bundles/", "bd/"), ("community/", "c/"), ("frontend/", "f/"))
+	replace_list = (("include/", "i/"), ("cloud/", "cl/"), ("api/", "a/"), ("backend/", "be/"), ("user/", "u/"), ("bundles/", "bd/"), ("community/", "c/"), ("frontend/", "f/"))
 	return multiple_replace(items, replace_list)
