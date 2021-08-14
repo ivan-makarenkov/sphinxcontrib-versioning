@@ -300,15 +300,10 @@ def read_config(source, current_name):
 
     logger = multiprocessing.get_logger()
     logger.setLevel(logging.INFO)
-
+    if source == '':
+        source = './'
     with TempDir() as temp_dir:
         argv = (source, temp_dir)
-        print(temp_dir)
-        print(argv)
-        print(config)
-        print(current_name)
-        print(queue)
-        print('---------------------------')
         log.debug('Running sphinx-build for config values with args: %s', str(argv))
         child = multiprocessing.Process(target=_read_config, args=(argv, config, current_name, queue))
         child.start()
