@@ -321,9 +321,13 @@ def multiple_replace(items, replace_list):
 	return result
 
 def decompress(items):
-	replace_list = (("i/", "include/"), ("cl/", "cloud/"), ("a/", "api/"), ("be/", "backend/"), ("u/", "user/"), ("bd/", "bundles/"), ("c/", "community/"), ("f/", "frontend/"))
-	return multiple_replace(json.loads(items), replace_list)
+    result = items
+    if type(test_string) == str:
+        replace_list = (("i/", "include/"), ("cl/", "cloud/"), ("a/", "api/"), ("be/", "backend/"), ("u/", "user/"), ("bd/", "bundles/"), ("c/", "community/"), ("f/", "frontend/"))
+        result = multiple_replace(json.loads(items), replace_list)
+    return result
 
 def compress(items):
-	replace_list = (("include/", "i/"), ("cloud/", "cl/"), ("api/", "a/"), ("backend/", "be/"), ("user/", "u/"), ("bundles/", "bd/"), ("community/", "c/"), ("frontend/", "f/"))
-	return json.dumps(multiple_replace(items, replace_list))
+    replace_list = (("include/", "i/"), ("cloud/", "cl/"), ("api/", "a/"), ("backend/", "be/"), ("user/", "u/"), ("bundles/", "bd/"), ("community/", "c/"), ("frontend/", "f/"))
+    return json.dumps(multiple_replace(items, replace_list))
+
