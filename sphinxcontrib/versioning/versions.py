@@ -220,7 +220,7 @@ class Versions(object):
             if r['kind'] == 'heads':
                 path = self.vpathto_or_none(r['name'])
                 if path is not None:
-                    branches.append((r['name'], r['human_readable_name'], path, self.pathtopdf(r['name']), r['root_dir']))
+                    branches.append((r['name'], r['human_readable_name'], path, r['root_dir']))
 
         return branches
 
@@ -232,7 +232,7 @@ class Versions(object):
             if r['kind'] == 'tags':
                 path = self.vpathto_or_none(r['name'])
                 if path is not None:
-                    tags.append((r['name'], r['human_readable_name'], path, self.pathtopdf(r['name']), r['root_dir']))
+                    tags.append((r['name'], r['human_readable_name'], path, r['root_dir']))
 
         return tags
 
@@ -296,20 +296,6 @@ class Versions(object):
             return None
 
         return self.vpathto(other_version)
-
-    def pathtopdf(self, other_version):
-        is_root = self.context['scv_is_root']
-        pagename = self.context['pagename']
-        # if self.context['current_version'] == other_version and not is_root:
-        #     return '{}.html'.format(pagename.split('/')[-1])
-
-        other_remote = self[other_version]
-        other_root_dir = other_remote['root_dir']
-        components = ['..'] * pagename.count('/')
-        components += [other_root_dir] if is_root else ['..', other_root_dir]
-        components += ["_static"]
-        components += [os.path.splitext(self.pdf_file)[0]]
-        return '{}.pdf'.format(__import__('posixpath').join(*components))
 
 def multiple_replace(items, replace_list):
 	result = []
