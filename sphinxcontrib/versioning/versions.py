@@ -322,7 +322,7 @@ def multiple_replace(items, replace_list):
 
 def decompress(items):
     result = items
-    if type(test_string) == str:
+    if type(items) == str:
         replace_list = (("i/", "include/"), ("cl/", "cloud/"), ("a/", "api/"), ("be/", "backend/"), ("u/", "user/"), ("bd/", "bundles/"), ("c/", "community/"), ("f/", "frontend/"))
         result = multiple_replace(json.loads(items), replace_list)
     return result
