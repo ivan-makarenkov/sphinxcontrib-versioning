@@ -314,6 +314,5 @@ def decompress(items):
     return result
 
 def compress(items):
-    print(items)
     replace_list = (("include/", "i/"), ("cloud/maintenance/", "cl/mt/"), ("cloud/", "cl/"), ("api/authentication/", "a/a/"), ("api/", "a/"), ("backend/", "be/"), ("user/", "u/"), ("bundles/", "bd/"), ("community/", "c/"), ("frontend/", "f/"))
     return json.dumps(multiple_replace(items, replace_list))
