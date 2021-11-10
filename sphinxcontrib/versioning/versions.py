@@ -309,10 +309,10 @@ def multiple_replace(items, replace_list):
 def decompress(items):
     result = items
     if type(items) == str:
-        replace_list = (("i/", "include/"), ("cl/mt/", "cloud/maintenance/"), ("cl/", "cloud/"), ("a/a/", "api/authentication/") ("a/", "api/"), ("be/", "backend/"), ("u/", "user/"), ("bd/", "bundles/"), ("c/", "community/"), ("f/", "frontend/"))
+        replace_list = (("i/", "include/"), ("/mt", "/maintenance"), ("cl/", "cloud/"), ("/au", "/authentication"), ("a/", "api/"), ("be/", "backend/"), ("u/", "user/"), ("bd/", "bundles/"), ("c/", "community/"), ("f/", "frontend/"))
         result = multiple_replace(json.loads(items), replace_list)
     return result
 
 def compress(items):
-    replace_list = (("include/", "i/"), ("cloud/maintenance/", "cl/mt/"), ("cloud/", "cl/"), ("api/authentication/", "a/a/"), ("api/", "a/"), ("backend/", "be/"), ("user/", "u/"), ("bundles/", "bd/"), ("community/", "c/"), ("frontend/", "f/"))
+    replace_list = (("include/", "i/"), ("/maintenance", "/mt"), ("cloud/", "cl/"), ("/authentication", "/au"), ("api/", "a/"), ("backend/", "be/"), ("user/", "u/"), ("bundles/", "bd/"), ("community/", "c/"), ("frontend/", "f/"))
     return json.dumps(multiple_replace(items, replace_list))
