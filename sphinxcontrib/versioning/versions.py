@@ -309,10 +309,16 @@ def multiple_replace(items, replace_list):
 def decompress(items):
     result = items
     if type(items) == str:
-        replace_list = (("i/", "include/"), ("/mt", "/maintenance"), ("cl/", "cloud/"), ("/au", "/authentication"), ("a/", "api/"), ("be/", "backend/"), ("u/", "user/"), ("bd/", "bundles/"), ("c/", "community/"), ("f/", "frontend/"))
+        replace_list = (("i/", "include/"), ("/mt", "/maintenance"), ("/cm", "/commerce"), ("/pl", "/platform"),
+        ("/bo", "/back-office"), ("/co", "/configuration"),  ("/sy", "/system"),  ("/st", "/storefront"),
+        ("cl/", "cloud/"), ("/au", "/authentication"), ("a/", "api/"), ("be/", "backend/"), ("u/", "user/"),
+        ("bd/", "bundles/"), ("c/", "community/"), ("f/", "frontend/"))
         result = multiple_replace(json.loads(items), replace_list)
     return result
 
 def compress(items):
-    replace_list = (("include/", "i/"), ("/maintenance", "/mt"), ("cloud/", "cl/"), ("/authentication", "/au"), ("api/", "a/"), ("backend/", "be/"), ("user/", "u/"), ("bundles/", "bd/"), ("community/", "c/"), ("frontend/", "f/"))
+    replace_list = (("include/", "i/"), ("/maintenance", "/mt"), ("/commerce", "/cm"), ("/platform", "/pl"),
+    ("/back-office", "/bo"), ("/configuration", "/co"),  ("/system", "/sy"),  ("/storefront", "/st"),
+    ("cloud/", "cl/"), ("/authentication", "/au"), ("api/", "a/"), ("backend/", "be/"), ("user/", "u/"),
+    ("bundles/", "bd/"), ("community/", "c/"), ("frontend/", "f/"))
     return json.dumps(multiple_replace(items, replace_list))
